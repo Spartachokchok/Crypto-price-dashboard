@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Crypto Dashboard{% endblock %}
+
+{% block head %}
+<meta http-equiv="refresh" content="300">
+{% endblock %}
+
+{% block content %}
+<h1>Crypto Dashboard</h1>
+
+<div class="price-container">
+    <div class="price-box">
+        <div>Bitcoin (BTC):</div>
+        <div class="price bitcoin-price">${{ btc_price }}</div>
+    </div>
+    
+    <div class="price-box">
+        <div>Ethereum (ETH):</div>
+        <div class="price ethereum-price">${{ eth_price }}</div>
+    </div>
+    
+    <div class="price-box">
+        <div>Solana (SOL):</div>
+        <div class="price solana-price">${{ sol_price }}</div>
+    </div>
+</div>
+
+<div class="chart-box">
+    <h2>Price History</h2>
+    <img src="{{ url_for('static', filename='images/crypto_prices.png') }}?t={{ timestamp }}" alt="Crypto Price Chart" class="chart-image">
+    <div class="update-time">
+        Last updated: {{ last_update }}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}
