@@ -3,7 +3,6 @@
 
 A real-time cryptocurrency dashboard that tracks prices for Bitcoin, Ethereum, and Solana using the CoinGecko API.
 
-![Dashboard Preview](screenshot.png)
 
 ## Features
 
