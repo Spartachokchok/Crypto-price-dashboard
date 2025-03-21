@@ -34,6 +34,39 @@ crypto_data = {
 }
 
 def update_data():
+    try:
+        # Get current prices
+        btc, eth, sol = get_crypto_prices()
+        
+        # Check if we got valid data
+        if "N/A" in (btc, eth, sol):
+            crypto_data["error_count"] += 1
+            logger.warning(f"Incomplete data received. Error count: {crypto_data['error_count']}")
+            
+            # If too many errors, show warning to user
+            if crypto_data["error_count"] > 3:
+                crypto_data["status"] = "api_issues"
+            
+            # Keep the old prices if they exist
+            if crypto_data["btc_price"] != "Loading...":
+                if btc == "N/A": btc = crypto_data["btc_price"]
+                if eth == "N/A": eth = crypto_data["eth_price"]
+                if sol == "N/A": sol = crypto_data["sol_price"]
+        else:
+            # Reset error counter if successful
+            crypto_data["error_count"] = 0
+            crypto_data["status"] = "ok"
+            crypto_data["last_successful_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Update data
+        crypto_data["btc_price"] = btc
+        crypto_data["eth_price"] = eth
+        crypto_data["sol_price"] = sol
+        crypto_data["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    except Exception as e:
+        logger.error(f"Error during data update: {e}")
+        crypto_data["error_count"] += 1
+        crypto_data["status"] = "error"
     """Background task to update cryptocurrency data and charts"""
     logger.info("Starting data update")
     

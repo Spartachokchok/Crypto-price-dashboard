@@ -9,6 +9,18 @@
 {% block content %}
 <h1>Crypto Dashboard</h1>
 
+
+{% if status == "error" %}
+<div class="status-box error">
+    <p>⚠️ API Error: Could not connect to cryptocurrency data service.</p>
+    <p>Showing last available data from {{ last_successful_update or "unknown time" }}.</p>
+</div>
+{% elif status == "api_issues" %}
+<div class="status-box warning">
+    <p>⚠️ Warning: API connection issues detected. Some data may be outdated.</p>
+</div>
+{% endif %}
+
 <div class="price-container">
     <div class="price-box">
         <div>Bitcoin (BTC):</div>
