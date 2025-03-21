@@ -25,15 +25,22 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Global variables to store the latest data
+# Global variables to store the latest data
 crypto_data = {
     "btc_price": "Loading...",
     "eth_price": "Loading...",
     "sol_price": "Loading...",
     "last_update": "Not updated yet",
-    "timestamp": int(time.time())
+    "timestamp": int(time.time()),
+    "error_count": 0,  
+    "status": "ok",    
+    "last_successful_update": None  
 }
 
 def update_data():
+    """Background task to update cryptocurrency data and charts"""
+    logger.info("Starting data update")
+    
     try:
         # Get current prices
         btc, eth, sol = get_crypto_prices()
@@ -63,37 +70,19 @@ def update_data():
         crypto_data["eth_price"] = eth
         crypto_data["sol_price"] = sol
         crypto_data["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        crypto_data["timestamp"] = int(time.time())
+        
+        # Collect price history and create chart
+        price_history = collect_price_history()
+        if price_history and len(price_history) > 0:
+            create_price_chart(price_history)
+            
+        logger.info(f"Data update completed at {crypto_data['last_update']}")
+            
     except Exception as e:
         logger.error(f"Error during data update: {e}")
         crypto_data["error_count"] += 1
         crypto_data["status"] = "error"
-    """Background task to update cryptocurrency data and charts"""
-    logger.info("Starting data update")
-    
-    # Get current prices
-    btc, eth, sol = get_crypto_prices()
-    
-    # Update global data
-    crypto_data["btc_price"] = btc
-    crypto_data["eth_price"] = eth
-    crypto_data["sol_price"] = sol
-    crypto_data["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    crypto_data["timestamp"] = int(time.time())
-    
-    # Collect price history and create chart
-    price_history = collect_price_history()
-    if price_history and len(price_history) > 0:
-        create_price_chart(price_history)
-    
-    logger.info(f"Data update completed at {crypto_data['last_update']}")
-
-# Initialize scheduler
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=update_data, trigger="interval", seconds=UPDATE_INTERVAL)
-scheduler.start()
-
-# Ensure scheduler shuts down when app exits
-atexit.register(lambda: scheduler.shutdown())
 
 @app.route('/')
 def index():
